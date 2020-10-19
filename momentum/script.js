@@ -11,7 +11,10 @@ const date = document.querySelector(".date"),
     weatherIcon = document.querySelector('.weather-icon'),
     temperature = document.querySelector('.temperature'),
     weatherDescription = document.querySelector('.weather-description'),
+    windSpeed = document.querySelector('.wind-speed'),
+    humidity = document.querySelector('.humidity'),
     city = document.querySelector('.city');
+
 
 // Options
 const showAmPm = true;
@@ -129,6 +132,7 @@ function setName(e) {
     }
 }
 
+// Focused inputs
 function focusInput(e) {
     if (e.target.classList.contains('name')) {
         e.target.value = '';
@@ -177,22 +181,58 @@ async function getWeather() {
     const url = `https://api.openweathermap.org/data/2.5/weather?q=${city.textContent}&lang=en&appid=08f2a575dda978b9c539199e54df03b0&units=metric`;
     const res = await fetch(url);
     const data = await res.json();
-
-    weatherIcon.className = 'weather-icon owf';
-    weatherIcon.classList.add(`owf-${data.weather[0].id}`);
-    temperature.textContent = `${data.main.temp.toFixed(0)}°C`;
-    weatherDescription.textContent = data.weather[0].description;
-}
-
-function setCity(event) {
-    if (event.code === 'Enter') {
-        getWeather();
-        city.blur();
+    if (res.ok) {
+        weatherIcon.className = 'weather-icon owf';
+        weatherIcon.classList.add(`owf-${data.weather[0].id}`);
+        temperature.textContent = `${data.main.temp.toFixed(0)}°C`;
+        weatherDescription.textContent = data.weather[0].description;
+        windSpeed.textContent = `${data.wind.speed} m/s`;
+        humidity.textContent = `${data.main.humidity}%`
+    } else {
+        city.textContent = 'Incorrect city!';
+        city.style.color = 'red';
+        localStorage.setItem('city', '')
     }
 }
 
-document.addEventListener('DOMContentLoaded', getWeather);
+function setCity(e) {
+    city.style.color = 'white';
+    if (e.type === 'keypress') {
+        if (e.which == 13 || e.keyCode == 13) {
+            localStorage.setItem('city', city.textContent);
+            getWeather();
+            city.blur();
+        }
+        if ((e.which == 32 || e.keyCode == 32) && city.textContent.length <= 1)
+            city.textContent = '';
+
+    } else {
+        if ((localStorage.getItem('city') !== null && city.textContent === '') || city.textContent === ' ') {
+            city.textContent = localStorage.getItem('city');
+        } else {
+            localStorage.setItem('city', city.textContent);
+        }
+        getWeather();
+    }
+
+}
+
+function getCity() {
+    if (localStorage.getItem('city') === null || localStorage.getItem('city') == '') {
+        localStorage.setItem('city', 'Minsk')
+        city.textContent = 'Minsk';
+    } else {
+        city.textContent = localStorage.getItem('city');
+    }
+    getWeather();
+}
+
+
 city.addEventListener('keypress', setCity);
+city.addEventListener('focus', () => {
+    city.textContent = '';
+});
+city.addEventListener('blur', setCity);
 document.addEventListener('DOMContentLoaded', getQuote);
 name.addEventListener('keypress', setName);
 name.addEventListener('focus', focusInput);
@@ -207,4 +247,5 @@ showDateTime();
 setBgGreet();
 getName();
 getFocusInp();
+getCity();
 setInterval(setBgGreet, 60 * 60 * 1000);

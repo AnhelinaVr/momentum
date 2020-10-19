@@ -9,7 +9,7 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
-  justify-content: space-around;
+  justify-content: space-between;
   text-align: center;
   height: 100vh;
   background-size: cover;
@@ -20,7 +20,7 @@ body {
 .time {
   font-size: 8rem;
   background: rgba(0, 0, 0, 0.2);
-  padding: 15px 45px 0;
+  padding: 1rem 2.8rem 0;
   border-radius: 50px;
   text-shadow: black 0 0 15px;
   font-family: "Courier Prime", monospace;
@@ -28,8 +28,8 @@ body {
 
 .date {
   background: rgba(0, 0, 0, 0.2);
-  padding: 0 45px 15px;
-  border-radius: 0 0 30px 30px;
+  padding: 0 2.8rem 1rem;
+  border-radius: 0 0 1.88rem 1.88rem;
 }
 
 h2 {
@@ -44,9 +44,14 @@ h3 {
 }
 
 .top-container {
+  margin-top: 1rem;
   display: flex;
   width: 95%;
   justify-content: space-between;
+}
+
+.temperature {
+  display: inline;
 }
 
 .date-time {
@@ -85,6 +90,7 @@ input.focus {
 
 .btn:hover {
   filter: grayscale(0.8);
+  cursor: pointer;
 }
 
 .btn:active,
@@ -97,10 +103,9 @@ input.focus {
 }
 
 .quote {
-  margin: 0;
   background: rgba(0, 0, 0, 0.3);
-  padding: 0.5rem;
-  border-radius: 1em;
+  padding: 0.1rem;
+  border-radius: 1rem;
   font-size: 1.1rem;
 }
 
@@ -113,25 +118,29 @@ input.focus {
   text-align: right;
 }
 
-@media (max-width: 700px) {
+@media (max-width: 768px) {
+  .time {
+    font-size: 6rem;
+  }
+}
+@media (max-width: 580px) {
   body,
 html {
-    font-size: 10px;
+    font-size: 14px;
+  }
+
+  .time {
+    font-size: 4rem;
+  }
+
+  h2 {
+    font-size: 1.5rem;
   }
 }
 @media (max-width: 400px) {
   body,
 html {
-    font-size: 8px;
-  }
-
-  .time {
-    font-size: 4rem;
-    padding: 15px 20px 0;
-  }
-
-  .date {
-    padding: 0 15px 10px;
+    font-size: 12px;
   }
 }
 
