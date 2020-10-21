@@ -14,10 +14,7 @@ const date = document.querySelector(".date"),
     windSpeed = document.querySelector('.wind-speed'),
     humidity = document.querySelector('.humidity'),
     city = document.querySelector('.city');
-
-
-// Options
-const showAmPm = true;
+let images = [];
 
 // Show Time
 function showDateTime() {
@@ -29,17 +26,19 @@ function showDateTime() {
         weekDay = today.getDay(),
         month = today.getMonth();
 
-
-
     // Output Time
     time.innerHTML = `${hour}<span>:</span>${addZero(min)}<span>:</span>${addZero(
     sec
   )}`;
     // Output Date
     date.innerHTML = `${getWeekDay(weekDay)}, ${day} ${getMonthName(month)}.`;
-
+    if (min == 0 && sec == 0) {
+        setBgGreet();
+    }
+    // Refresh every second
     setTimeout(showDateTime, 1000);
 }
+
 // Get week day
 function getWeekDay(weekDay) {
     let days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
@@ -50,57 +49,116 @@ function getWeekDay(weekDay) {
 function getMonthName(month) {
     let months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
     return months[month];
-
 }
 
-// Add Zeros
+// Add Zeros to minutes and seconds
 function addZero(n) {
     return (parseInt(n, 10) < 10 ? '0' : '') + n;
 }
 
+// Shuffle array
+function shuffle(array) {
+    var currentIndex = array.length,
+        temporaryValue, randomIndex;
+    while (0 !== currentIndex) {
+        randomIndex = Math.floor(Math.random() * currentIndex);
+        currentIndex -= 1;
+        temporaryValue = array[currentIndex];
+        array[currentIndex] = array[randomIndex];
+        array[randomIndex] = temporaryValue;
+    }
+    return array;
+}
 
-// Set Background and Greeting
-function setBgGreet() {
+// Change background image after loading
+function viewBgImage(data) {
+    const src = data;
+    const img = document.createElement('img');
+    img.src = src;
+    img.onload = () => {
+        document.body.style.backgroundImage = `url('${src}')`;
+    };
+}
+
+// Get image depending on the time
+function getImage(btn) {
+    let today = new Date(),
+        hour = today.getHours();
+
+    let imageSRC = images[hour];
+
+    if (btn) {
+        let index = (hour + (i % 24 + 1)) % 24;
+        imageSRC = images[index];
+        viewBgImage(imageSRC);
+        i++;
+    }
+
+    viewBgImage(imageSRC);
+}
+
+function btnChangeBg() {
+    getImage(true);
+}
+
+// Create array with images for the current day
+function setImages() {
     const bgImgUrl_morning = 'assets/images/morning/',
         bgImgUrl_day = 'assets/images/day/',
         bgImgUrl_evening = 'assets/images/evening/',
         bgImgUrl_night = 'assets/images/night/';
+
     let morning_img = [],
         day_img = [],
         evening_img = [],
         night_img = [];
+
     for (let i = 1; i <= 20; i++) {
-        morning_img[i] = `${bgImgUrl_morning}${i}.jpg`;
-        day_img[i] = `${bgImgUrl_day}${i}.jpg`;
-        evening_img[i] = `${bgImgUrl_evening}${i}.jpg`;
-        night_img[i] = `${bgImgUrl_night}${i}.jpg`;
+        morning_img[i - 1] = `${bgImgUrl_morning}${i}.jpg`;
+        day_img[i - 1] = `${bgImgUrl_day}${i}.jpg`;
+        evening_img[i - 1] = `${bgImgUrl_evening}${i}.jpg`;
+        night_img[i - 1] = `${bgImgUrl_night}${i}.jpg`;
     }
 
+    morning_img = shuffle(morning_img);
+    day_img = shuffle(day_img);
+    evening_img = shuffle(evening_img);
+    night_img = shuffle(night_img);
+
+    for (i = 0; i < 24; i++) {
+        if (i < 6 && i >= 0) {
+            images[i] = night_img[i % 20];
+        }
+        if (i < 12 && i >= 6) {
+            images[i] = morning_img[i % 20];
+        }
+        if (i < 18 && i >= 12) {
+            images[i] = day_img[i % 20];
+        }
+        if (i < 24 && i >= 18) {
+            images[i] = evening_img[i % 20];
+        }
+    }
+}
+
+// Set Background and Greeting
+function setBgGreet() {
     let today = new Date(),
         hour = today.getHours();
-    let los = Math.floor(Math.random() * 20 + 1);
-
-    if (hour < 12) {
-        // Morning
-        document.body.style.backgroundImage =
-            `url('${morning_img[los]}'`;
+    getImage();
+    // Morning
+    if (hour < 12)
         greeting.textContent = 'Good morning, ';
-    } else if (hour < 18) {
-        // Afternoon
-        document.body.style.backgroundImage =
-            `url('${day_img[los]}'`;
+    // Afternoon
+    else if (hour < 18)
         greeting.textContent = 'Good afternoon, ';
-    } else if (hour >= 0 && hour < 6) {
-        // Night
-        document.body.style.backgroundImage =
-            `url('${night_img[los]}'`;
+    // Night
+    else if (hour >= 0 && hour < 6)
         greeting.textContent = 'Good night, ';
-    } else {
-        // Evening
-        document.body.style.backgroundImage =
-            `url('${evening_img[los]}'`;
+    // Evening
+    else
         greeting.textContent = 'Good evening, ';
-    }
+
 }
 
 // Get Name
@@ -123,16 +181,15 @@ function setName(e) {
         // Space click
         if ((e.which == 32 || e.keyCode == 32) && name.value.length <= 1)
             name.value = '';
-    } else {
+    } else { // Blur
         if (localStorage.getItem('name') !== null && name.value === '' || name.value === ' ')
             name.value = localStorage.getItem('name');
         else
             localStorage.setItem('name', e.target.value);
-
     }
 }
 
-// Focused inputs
+// Clean focused inputs
 function focusInput(e) {
     if (e.target.classList.contains('name')) {
         e.target.value = '';
@@ -158,9 +215,10 @@ function setFocusInp(e) {
             localStorage.setItem('focus', e.target.value);
             focusInp.blur();
         }
+        // Space click
         if ((e.which == 32 || e.keyCode == 32) && focusInp.value.length <= 1)
             focusInp.value = '';
-    } else {
+    } else { // Blur
         if (localStorage.getItem('focus') !== null && focusInp.value === '' || focusInp.value === ' ') {
             focusInp.value = localStorage.getItem('focus');
         } else {
@@ -169,6 +227,7 @@ function setFocusInp(e) {
     }
 }
 
+// Getting quote from API
 async function getQuote() {
     const url = `https://cors-anywhere.herokuapp.com/https://api.forismatic.com/api/1.0/?method=getQuote&format=json&lang=en`;
     const res = await fetch(url);
@@ -177,6 +236,7 @@ async function getQuote() {
     figcaption.textContent = data.quoteAuthor;
 }
 
+// Get info about weather from API
 async function getWeather() {
     const url = `https://api.openweathermap.org/data/2.5/weather?q=${city.textContent}&lang=en&appid=08f2a575dda978b9c539199e54df03b0&units=metric`;
     const res = await fetch(url);
@@ -195,6 +255,7 @@ async function getWeather() {
     }
 }
 
+// Setting city for getting weather
 function setCity(e) {
     city.style.color = 'white';
     if (e.type === 'keypress') {
@@ -205,25 +266,22 @@ function setCity(e) {
         }
         if ((e.which == 32 || e.keyCode == 32) && city.textContent.length <= 1)
             city.textContent = '';
-
     } else {
-        if ((localStorage.getItem('city') !== null && city.textContent === '') || city.textContent === ' ') {
+        if ((localStorage.getItem('city') !== null && city.textContent === '') || city.textContent === ' ')
             city.textContent = localStorage.getItem('city');
-        } else {
+        else
             localStorage.setItem('city', city.textContent);
-        }
+
         getWeather();
     }
-
 }
 
 function getCity() {
     if (localStorage.getItem('city') === null || localStorage.getItem('city') == '') {
         localStorage.setItem('city', 'Minsk')
         city.textContent = 'Minsk';
-    } else {
+    } else
         city.textContent = localStorage.getItem('city');
-    }
     getWeather();
 }
 
@@ -240,12 +298,13 @@ name.addEventListener('blur', setName);
 focusInp.addEventListener('keypress', setFocusInp);
 focusInp.addEventListener('focus', focusInput);
 focusInp.addEventListener('blur', setFocusInp);
-btn_bg.addEventListener('click', setBgGreet);
+btn_bg.addEventListener('click', btnChangeBg);
 btn_quote.addEventListener('click', getQuote);
+
 // Run
+setImages();
 showDateTime();
 setBgGreet();
 getName();
 getFocusInp();
 getCity();
-setInterval(setBgGreet, 60 * 60 * 1000);
