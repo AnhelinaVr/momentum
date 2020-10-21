@@ -56,6 +56,15 @@ h3 {
   font-size: 2rem;
 }
 
+.city {
+  border-radius: 10px;
+}
+.city:hover {
+  cursor: pointer;
+  opacity: 0.7;
+  background: rgba(0, 0, 0, 0.1);
+}
+
 .temperature {
   display: inline;
   font-size: 2rem;
