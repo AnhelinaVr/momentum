@@ -175,17 +175,17 @@ function setName(e) {
     if (e.type === 'keypress') {
         // Make sure enter is pressed
         if (e.which == 13 || e.keyCode == 13) {
-            localStorage.setItem('name', e.target.value);
+            if (e.target.value.trim().length !== 0)
+                localStorage.setItem('name', e.target.value);
             name.blur();
+            name.classList.add('blur');
         }
-        // Space click
-        if ((e.which == 32 || e.keyCode == 32) && name.value.length <= 1)
-            name.value = '';
     } else { // Blur
-        if (localStorage.getItem('name') !== null && name.value === '' || name.value === ' ')
+        if (localStorage.getItem('name') !== null && name.value.trim().length === 0)
             name.value = localStorage.getItem('name');
         else
             localStorage.setItem('name', e.target.value);
+        name.classList.add('blur');
     }
 }
 
@@ -193,9 +193,12 @@ function setName(e) {
 function focusInput(e) {
     if (e.target.classList.contains('name')) {
         e.target.value = '';
+        name.classList.remove('blur');
     } else if (e.target.classList.contains('focus')) {
         e.target.value = '';
+        focusInp.classList.remove('blur');
     }
+
 }
 
 // Get FocusInp
@@ -212,18 +215,18 @@ function setFocusInp(e) {
     if (e.type === 'keypress') {
         // Make sure enter is pressed
         if (e.which == 13 || e.keyCode == 13) {
-            localStorage.setItem('focus', e.target.value);
+            if (e.target.value.trim().length !== 0)
+                localStorage.setItem('focus', e.target.value);
             focusInp.blur();
+            focusInp.classList.add('blur');
         }
-        // Space click
-        if ((e.which == 32 || e.keyCode == 32) && focusInp.value.length <= 1)
-            focusInp.value = '';
     } else { // Blur
-        if (localStorage.getItem('focus') !== null && focusInp.value === '' || focusInp.value === ' ') {
+        if (localStorage.getItem('focus') !== null && focusInp.value.trim().length === 0) {
             focusInp.value = localStorage.getItem('focus');
         } else {
             localStorage.setItem('focus', e.target.value);
         }
+        focusInp.classList.add('blur');
     }
 }
 
@@ -238,20 +241,21 @@ async function getQuote() {
 
 // Get info about weather from API
 async function getWeather() {
-    const url = `https://api.openweathermap.org/data/2.5/weather?q=${city.textContent}&lang=en&appid=08f2a575dda978b9c539199e54df03b0&units=metric`;
-    const res = await fetch(url);
-    const data = await res.json();
-    if (res.ok) {
+    const url = `https://api.openweathermap.org/data/2.5/weather?q=${city.textContent}&lang=en&appid=011de57da172ce619df27f6ba2d03b55&units=metric`;
+    try {
+        let res = await fetch(url);
+        let data = await res.json();
         weatherIcon.className = 'weather-icon owf';
         weatherIcon.classList.add(`owf-${data.weather[0].id}`);
         temperature.textContent = `${data.main.temp.toFixed(0)}°C`;
         weatherDescription.textContent = data.weather[0].description;
         windSpeed.textContent = `${data.wind.speed} m/s`;
         humidity.textContent = `${data.main.humidity}%`
-    } else {
+    } catch (error) {
         city.textContent = 'Incorrect city!';
         city.style.color = 'red';
-        localStorage.setItem('city', '')
+        localStorage.setItem('city', '');
+        console.log('error ' + error)
     }
 }
 
@@ -260,18 +264,16 @@ function setCity(e) {
     city.style.color = 'white';
     if (e.type === 'keypress') {
         if (e.which == 13 || e.keyCode == 13) {
-            localStorage.setItem('city', city.textContent);
-            getWeather();
+            if (city.textContent.trim().length !== 0)
+                localStorage.setItem('city', city.textContent);
+            getCity();
             city.blur();
         }
-        if ((e.which == 32 || e.keyCode == 32) && city.textContent.length <= 1)
-            city.textContent = '';
     } else {
-        if ((localStorage.getItem('city') !== null && city.textContent === '') || city.textContent === ' ')
+        if (localStorage.getItem('city') !== null && city.textContent.trim().length !== 0)
             city.textContent = localStorage.getItem('city');
         else
             localStorage.setItem('city', city.textContent);
-
         getWeather();
     }
 }
