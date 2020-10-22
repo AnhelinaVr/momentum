@@ -76,7 +76,6 @@ h3 {
 
 .user_container {
   text-shadow: black 0 0 3px;
-  flex-basis: 50%;
   margin-top: 1rem;
 }
 
@@ -138,8 +137,11 @@ input.blur {
 }
 
 .quote_container {
+  position: absolute;
+  bottom: 0;
   width: 100%;
   display: flex;
+  background: rgba(0, 0, 0, 0.3);
 }
 .quote_container .btn {
   margin-right: 1rem;
@@ -150,10 +152,8 @@ input.blur {
 
 .quote {
   margin: 0 auto;
-  background: rgba(0, 0, 0, 0.3);
   padding: 0.1rem;
-  border-radius: 1rem;
-  font-size: 0.9rem;
+  font-size: 1.2rem;
 }
 .quote figcaption,
 .quote blockquote {
@@ -167,15 +167,6 @@ input.blur {
 @media (max-width: 768px) {
   .date-time {
     margin: 9rem 0 0;
-  }
-
-  h2,
-input {
-    font-size: 1.15rem;
-  }
-
-  .quote {
-    font-size: 0.85rem;
   }
 }
 @media (max-width: 580px) {
@@ -194,12 +185,7 @@ html {
 
   h2 {
     font-size: 1.5rem;
-  }
-}
-@media (max-width: 400px) {
-  body,
-html {
-    font-size: 12px;
+    margin-top: 2rem;
   }
 }
 
